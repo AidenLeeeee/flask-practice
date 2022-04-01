@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Response
 
 def create_app():
     print('run: create_app()')
@@ -64,4 +64,20 @@ def create_app():
     def teardown_appcontext(exception):
         app.logger.info('TEARDOWN_CONTEXT')
         
+    ''' Method '''
+    from flask import request
+    
+    def on_json_loading_failed_return_dict(e):
+        return {}
+    
+    @app.route('/test/method/<id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
+    def method_test(id):
+        request.on_json_loading_failed = on_json_loading_failed_return_dict
+        return jsonify({
+            'request.method': request.method,
+            'request.args': request.args,
+            'request.form': request.form,
+            'request.json': request.json,
+            })
+    
     return app
