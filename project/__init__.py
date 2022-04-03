@@ -4,6 +4,9 @@ from flask import render_template
 def create_app():
     print('run: create_app()')
     app = Flask(__name__)
+    
+    if app.config['DEBUG']:
+        app.config['SEND_FILE_MAX_AGE_DEFAULT'] = None
 
     @app.route('/')
     def index():
