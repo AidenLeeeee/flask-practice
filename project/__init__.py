@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 from flask import render_template
 from flask_wtf.csrf import CSRFProtect
 
@@ -21,14 +22,35 @@ def create_app():
         return render_template('index.html')
     
     from project.forms.auth_form import LoginForm, RegisterForm
-    @app.route('/auth/login')
+    @app.route('/auth/login', methods=['GET', 'POST'])
     def login():
         form = LoginForm()
+        
+        # POST, validate OK!
+        if form.validate_on_submit():
+            user_id = form.data.get('user_id')
+            password = form.data.get('password')
+            return f'{user_id} {password}'
+        else:
+            pass
+            
         return render_template('login.html', form=form)
         
-    @app.route('/auth/register')
+    @app.route('/auth/register', methods=['GET', 'POST'])
     def register():
         form = RegisterForm()
+        
+        # POST, validate OK!
+        if form.validate_on_submit():
+            user_id = form.data.get('user_id')
+            user_name = form.data.get('user_name')
+            password = form.data.get('password')
+            repassword = form.data.get('repassword')
+            return f'{user_id} {user_name} {password} {repassword}'
+            
+        else:
+            pass
+        
         return render_template('register.html', form=form)
         
     @app.route('/auth/logout')
