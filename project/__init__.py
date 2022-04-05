@@ -2,8 +2,12 @@ from flask import Flask
 from flask import request
 from flask import render_template
 from flask_wtf.csrf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 csrf = CSRFProtect()
+db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app():
     print('run: create_app()')
@@ -11,9 +15,18 @@ def create_app():
     
     app.config['SECRET_KEY'] = 'secretkey'
     app.config['SESSION_COOKIE_NAME'] = 'project'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/project?charset=utf8'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     if app.config['DEBUG']:
         app.config['SEND_FILE_MAX_AGE_DEFAULT'] = None
+    
+    ''' DB INIT '''
+    db.init_app(app)
+    if app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite'):
+        migrate.init_app(app, db, render_as_batch=True)
+    else:
+        migrate.init_app(app, db)
         
     ''' Routes INIT '''
     from project.routes import base_route, auth_route
