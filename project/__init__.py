@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g
 from flask import request
 from flask import render_template
 from flask_wtf.csrf import CSRFProtect
@@ -36,6 +36,16 @@ def create_app():
     ''' CSRF INIT '''
     csrf.init_app(app)
     
+    '''REQUEST HOOK'''
+    @app.before_request
+    def before_request():
+        g.db = db.session
+    
+    @app.teardown_request
+    def teardown_request(exception):
+        if hasattr(g, 'db'):
+            g.db.close()
+        
     @app.errorhandler(404)
     def page_404(error):
         return render_template('/404.html'), 404
