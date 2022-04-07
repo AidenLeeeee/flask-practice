@@ -13,6 +13,7 @@ user = ns.model('User', {
     'id': fields.Integer(required=True, description='user_num'),
     'user_id': fields.String(required=True, description='user_id'),
     'user_name': fields.String(required=True, description='user_name'),
+    'created_at': fields.DateTime(description='sign_in_date')
 })
 
 post_parser = reqparse.RequestParser()
