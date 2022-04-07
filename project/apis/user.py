@@ -17,9 +17,9 @@ user = ns.model('User', {
 })
 
 post_parser = reqparse.RequestParser()
-post_parser.add_argument('user_id', required=True, help='user_id', location='args')
-post_parser.add_argument('user_name', required=True, help='user_name', location='args')
-post_parser.add_argument('password', required=True, help='user_password', location='args')
+post_parser.add_argument('user_id', required=True, help='user_id', location=['args', 'form'])
+post_parser.add_argument('user_name', required=True, help='user_name', location=['args', 'form'])
+post_parser.add_argument('password', required=True, help='user_password', location=['args', 'form'])
 
 # /api/users
 @ns.route('')
