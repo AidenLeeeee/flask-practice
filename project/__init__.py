@@ -1,5 +1,4 @@
 from flask import Flask, g
-from flask import request
 from flask import render_template
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
@@ -9,19 +8,20 @@ csrf = CSRFProtect()
 db = SQLAlchemy()
 migrate = Migrate()
 
-def create_app():
+def create_app(config=None):
     print('run: create_app()')
     app = Flask(__name__)
     
-    app.config['SECRET_KEY'] = 'secretkey'
-    app.config['SESSION_COOKIE_NAME'] = 'project'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/project?charset=utf8'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SWAGGER_UI_DOC_EXPANSION'] = 'list'
-    
-    if app.config['DEBUG']:
-        app.config['SEND_FILE_MAX_AGE_DEFAULT'] = None
-        app.config['WTF_CSRF_ENABLED'] = False
+    '''Flask Configs'''
+    from .configs import DevelopmentConfig, ProductionConfig
+    if not config:
+        if app.config['DEBUG']:
+            config = DevelopmentConfig()
+        else:
+            config = ProductionConfig()
+            
+    print('run with', config)
+    app.config.from_object(config)
         
     ''' CSRF INIT '''
     csrf.init_app(app)
