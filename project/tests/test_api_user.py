@@ -1,3 +1,4 @@
+import json
 def test_get_users(client):
     r = client.get(
         '/api/users',

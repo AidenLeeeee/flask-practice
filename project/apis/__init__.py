@@ -1,4 +1,3 @@
-from turtle import title
 from flask import Blueprint
 from flask_restx import Api
 from .user import ns as UserNamespace
