@@ -24,6 +24,7 @@ post_parser.add_argument('password', required=True, help='user_password', locati
 # /api/users
 @ns.route('')
 @ns.response(409, 'User Id already exists!')
+@ns.deprecated
 class UserList(Resource):
     @ns.marshal_list_with(user, skip_none=True)
     def get(self):
@@ -53,6 +54,7 @@ class UserList(Resource):
 # /api/users/{id}
 @ns.route('/<int:id>')
 @ns.param('id', 'user_num')
+@ns.deprecated
 class User(Resource):
     @ns.marshal_list_with(user, skip_none=True)
     def get(self, id):
