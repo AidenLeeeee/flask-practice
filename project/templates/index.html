@@ -6,8 +6,66 @@ Index
 
 {% block head -%}
     {{ super( )}}
+    <!--Masonry JS-->
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <!--Masonry Image Loaded JS-->
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 {%- endblock %}
 
-{% block body -%}
-<h1>Hello {{ g.user.user_id }} ! 😊</h1>
-{%- endblock %}
+{% block content %}
+    {{ super() }}
+    <!--팝업 모달 : dialog-->
+    {% include "_modal_edit.html" %}
+{% endblock %}
+
+{% block container %}
+    <!-- Masonry 가 width값을 잡기 위한 sizer -->
+    <div class="sizer"></div>
+    <!-- //Masonry 가 width값을 잡기 위한 sizer -->
+
+    <!--메모 예시-->
+    <div id="item1" class="item mdl-card" data-id="1">
+        <div class="modal-run mdl-card__title">
+            <h2 class="item-title mdl-card__title-text">Welcome</h2>
+        </div>
+        <div class="item-media modal-run mdl-card__media">
+            <img src="https://via.placeholder.com/300">
+        </div>
+        <div class="item-content modal-run mdl-card__supporting-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Mauris sagittis pellentesque lacus eleifend lacinia...
+        </div>
+        <div class="item-chip modal-run">
+            <span class="mdl-chip">
+                <span class="mdl-chip__text">label_placeholder</span>
+            </span>
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            <button id="itemLabelBtn1" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" onclick="MEMO.getLabelsForMenu(event, 1);">
+                <i class="material-icons-outlined">label</i>
+            </button>
+            <ul class="item-labels mdl-menu mdl-menu--top-left mdl-js-menu mdl-js-ripple-effect" data-mdl-for="itemLabelBtn1">
+                <li class="mdl-menu__item" onclick="MEMO.attachLabels(1);"><b>저장</b></li>
+                <li class="mdl-menu__item" onclick="">닫기</li>
+            </ul>
+            <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" onclick="MEMO.detachImage(event, 1);">
+                <i class="material-icons-outlined">layers_clear</i>
+            </button>
+        </div>
+        <div class="mdl-card__menu">
+            <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" onclick="MEMO.reviveMemo(event, 1)">
+                <i class="material-icons-outlined">undo</i>
+            </button>
+            <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" onclick="MEMO.deleteMemo(event, 1)">
+                <i class="material-icons-outlined">clear</i>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block tail %}
+    <!--UI 관련 style JS-->
+    <script src="{{ url_for('static', filename='js/style.js') }}" charset="utf-8"></script>
+    <!--API 호출 JS-->
+    <script src="{{ url_for('static', filename='js/ajax.js') }}" charset="utf-8"></script>
+    <!--API 호출트리거 및 index 페이지용 JS-->
+    <script src="{{ url_for('static', filename='js/index.js') }}" charset="utf-8"></script>
+{% endblock %}
