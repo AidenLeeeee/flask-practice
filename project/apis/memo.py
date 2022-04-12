@@ -28,6 +28,7 @@ put_parser.replace_argument('content', required=False, help='memo_content', loca
 
 get_parser = reqparse.RequestParser()
 get_parser.add_argument('page', required=False, type=int, help='page_num', location='args')
+get_parser.add_argument('needle', required=False, help='memo_needle', location='args')
 
 
 @ns.route('')
@@ -38,6 +39,7 @@ class MemoList(Resource):
         '''Get All Memos'''
         args = get_parser.parse_args()
         page = args['page']
+        needle = args['needle']
         per_page = 15
         
         base_query = MemoModel.query.join(
@@ -46,6 +48,12 @@ class MemoList(Resource):
         ).filter(
             UserModel.id == g.user.id
         )
+        
+        if needle:
+            needle = f'%{needle}%'
+            base_query = base_query.filter(
+                MemoModel.title.ilike(needle) | MemoModel.content.ilike(needle)
+            )
         
         pages = base_query.order_by(
             MemoModel.created_at.desc()
