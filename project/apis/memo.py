@@ -177,3 +177,23 @@ class Memo(Resource):
         g.db.delete(memo)
         g.db.commit()
         return '', 204
+
+
+@ns.route('/<int:id>/image')
+@ns.param('id')
+class MemoImage(Resource):
+    def delete(self, id):
+        '''Delete Memo Image'''
+        memo = MemoModel.query.get_or_404(id)
+        if g.user.id != memo.user_id:
+            ns.abort(403)
+        if memo.linked_image:
+            origin_path = os.path.join(
+                current_app.root_path,
+                memo.linked_image
+            )
+            if os.path.isfile(origin_path):
+                shutil.rmtree(os.path.dirname(origin_path))
+            memo.linked_image = None
+            g.db.commit()
+        return '', 204
