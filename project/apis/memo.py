@@ -26,21 +26,34 @@ put_parser = parser.copy()
 put_parser.replace_argument('title', required=False, help='memo_title', location='form')
 put_parser.replace_argument('content', required=False, help='memo_content', location='form')
 
+get_parser = reqparse.RequestParser()
+get_parser.add_argument('page', required=False, type=int, help='page_num', location='args')
+
 
 @ns.route('')
 class MemoList(Resource):
+    @ns.expect(get_parser)
     @ns.marshal_list_with(memo, skip_none=True)
     def get(self):
         '''Get All Memos'''
-        data = MemoModel.query.join(
+        args = get_parser.parse_args()
+        page = args['page']
+        per_page = 15
+        
+        base_query = MemoModel.query.join(
             UserModel,
             UserModel.id == MemoModel.user_id
         ).filter(
             UserModel.id == g.user.id
-        ).order_by(
+        )
+        
+        pages = base_query.order_by(
             MemoModel.created_at.desc()
-        ).limit(10).all()
-        return data
+        ).paginate(
+            page=page,
+            per_page=per_page,
+        )
+        return pages.items
     
     @ns.expect(parser)
     @ns.marshal_list_with(memo, skip_none=True)
