@@ -289,7 +289,10 @@ const MEMO = (function(){
         $modalTitle.val(r.title);
         $modalContent.val(r.content);
         $modalClose.attr('data-id', r.id);
-        // TODO Image Rendering
+        if (r.linked_image) {
+          const ihtml = '<img src="' + r.linked_image + '" />'
+          $modalMedia.html(ihtml);
+        }
         $modalContent.trigger('keyup');
       }
     })
@@ -321,7 +324,6 @@ const MEMO = (function(){
     const $media = $item.find('.item-media');
     const data = new FormData(form);
 
-    console.log('updateMemo');
     if ($modalModified.val() == 1) {
       $.ajax({
         url: '/api/memos/' + id,
@@ -333,7 +335,10 @@ const MEMO = (function(){
         success: function(r){
           $title.html(r.title);
           $content.html(r.content);
-          // TODO Link Image Rendering
+          if (r.linked_image) {
+            const ihtml = '<img src="' + r. linked_image + '" />'
+            $media.html(ihtml);
+          }
         },
         error: function(e){
           alert(e.responseText);
@@ -369,13 +374,20 @@ const MEMO = (function(){
 
     e.preventDefault();
     const $media = $('.item[data-id="' + id + '"]').find('.item-media');
-    console.log('detachImage', id);
     if (id && $media.find('img').length > 0){
-      // TODO
-      // 1) 메모 이미지 삭제 요청
-      // 2) 메모 아이템에 메모삭제
-      // 3) 에러시 얼럿노출
-      // 4) 완료시 모달 리셋: resetModalFields(true);
+      $.ajax({
+        url: '/api/memos/' + id + '/image',
+        type: 'delete',
+        success: function(r){
+          $media.html('');
+        },
+        error: function(e){
+          alert(e.responseText);
+        },
+        complete: function(){
+          resetModalFields(true);
+        }
+      });
     }
   }
 
