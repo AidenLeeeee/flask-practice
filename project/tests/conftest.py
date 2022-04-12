@@ -9,6 +9,7 @@ from project.models.user import User as UserModel
 from project.models.memo import Memo as MemoModel
 import pytest
 import os
+import shutil
 
 
 @pytest.fixture(scope='session')
@@ -43,6 +44,14 @@ def app(user_data, memo_data):
         db.session.commit()
         yield app
         # delete test_client in db
+        
+        # /static/user_images/tester(==user_id)
+        path = os.path.join(
+            app.static_folder,
+            app.config['USER_STATIC_BASE_DIR'],
+            user_data['user_id']
+        )
+        shutil.rmtree(path, True)
         db.drop_all()
         db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace(
             'sqlite:///',
