@@ -1,5 +1,5 @@
-from flask import g, request, jsonify
-from flask_restx import Namespace, Resource, abort, fields, reqparse
+from flask import g
+from flask_restx import Namespace, Resource, fields, reqparse
 from project.models.user import User as UserModel
 from werkzeug import security
 
