@@ -1,7 +1,6 @@
-from distutils.command.upload import upload
 from project.models.memo import Memo as MemoModel
 from project.models.user import User as UserModel
-from flask_restx import Namespace, fields, Resource, reqparse
+from flask_restx import Namespace, fields, Resource, reqparse, inputs
 from flask import g, current_app
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
@@ -19,6 +18,7 @@ memo = ns.model('Memo', {
     'title': fields.String(required=True, description='memo_title'),
     'content': fields.String(required=True, description='memo_content'),
     'linked_image': fields.String(required=False, description='memo_image'),
+    'is_deleted': fields.Boolean(description='memo_delete_flag'),
     'created_at': fields.DateTime(description='memo_created'),
     'updated_at': fields.DateTime(description='memo_updated'),
 })
@@ -27,6 +27,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('title', required=True, help='title', location='form')
 parser.add_argument('content', required=True, help='content', location='form')
 parser.add_argument('linked_image', required=False, type=FileStorage, help='memo_image', location='files')
+parser.add_argument('is_deleted', required=False, type=inputs.boolean, help='memo_delete_flag', location='form')
 
 put_parser = parser.copy()
 put_parser.replace_argument('title', required=False, help='memo_title', location='form')
@@ -35,7 +36,7 @@ put_parser.replace_argument('content', required=False, help='memo_content', loca
 get_parser = reqparse.RequestParser()
 get_parser.add_argument('page', required=False, type=int, help='page_num', location='args')
 get_parser.add_argument('needle', required=False, help='memo_needle', location='args')
-
+get_parser.add_argument('is_deleted', required=False, type=inputs.boolean, help='memo_delete_flag', location='args')
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -90,12 +91,16 @@ class MemoList(Resource):
         page = args['page']
         needle = args['needle']
         per_page = 15
+        is_deleted = args['is_deleted']
+        if is_deleted is None:
+            is_deleted = False
         
         base_query = MemoModel.query.join(
             UserModel,
             UserModel.id == MemoModel.user_id
         ).filter(
-            UserModel.id == g.user.id
+            UserModel.id == g.user.id,
+            MemoModel.is_deleted == is_deleted
         )
         
         if needle:
@@ -122,6 +127,8 @@ class MemoList(Resource):
             content = args['content'],
             user_id = g.user.id
         )
+        if args['is_deleted'] is not None:
+            memo.is_deleted = args['is_deleted']
         file = args['linked_image']
         if file:
             relative_path, _ = save_file(file)
@@ -140,7 +147,7 @@ class Memo(Resource):
         data = MemoModel.query.get_or_404(id)
         if g.user.id != data.user_id:
            ns.abort(403)
-        return data 
+        return data
     
     @ns.expect(put_parser)
     @ns.marshal_list_with(memo, skip_none=True)
@@ -154,6 +161,8 @@ class Memo(Resource):
             memo.title = args['title']
         if args['content'] is not None:
             memo.content = args['content']
+        if args['is_deleted'] is not None:
+            memo.is_deleted = args['is_deleted']
         file = args['linked_image']
         if file:
             relative_path, upload_path = save_file(file)
