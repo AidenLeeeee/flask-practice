@@ -23,8 +23,11 @@ WORKDIR /var/www/project
 # 설치한 패키지 명령어를 사용하기 위해 환경변수 등록
 ENV PATH="/home/python/.local/bin:${PATH}"
 
+# entrypoint.sh 실행권한 추가
+RUN chmod +x ./etc/docker-entrypoint.sh
+
 # 8080 PORT 노출
 EXPOSE 8080
 
 # gunicorn 실행
-CMD gunicorn --bind :8080 --workers 2 --threads 8 'project:create_app()'
+# CMD gunicorn --bind :8080 --workers 2 --threads 8 'project:create_app()'
