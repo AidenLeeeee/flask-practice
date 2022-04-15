@@ -20,6 +20,19 @@ parser.add_argument('content', required=True, type=str, help='label_content', lo
 
 @ns.route('')
 class LabelList(Resource):
+    @ns.marshal_list_with(label, skip_none=True)
+    def get(self):
+        '''Get All Labels'''
+        query = LabelModel.query.join(
+            UserModel,
+            UserModel.id == LabelModel.user_id
+        ).filter(
+            UserModel.id == g.user.id
+        )
+        
+        return query.all()
+        
+    
     @ns.expect(parser)
     @ns.marshal_list_with(label, skip_none=True)
     def post(self):
