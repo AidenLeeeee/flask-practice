@@ -1,5 +1,19 @@
 version: '3.7'
 services:
+  memo-nginx:
+    container_name: memo-nginx
+    image: nginx
+    restart: always
+    volumes:
+      - ./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - memosocket:/tmp
+    networks:
+      - memonet
+    depends_on:
+      - memo-web
+    ports:
+      - 80:80
+
   memo-web:
     container_name: memo-web
     image: memo-web
@@ -12,6 +26,7 @@ services:
       - memo-db
     volumes:
       - ./:/var/www/project
+      - memosocket:/tmp
     restart: always
     environment:
       - FLASK_APP=project
@@ -41,3 +56,4 @@ networks:
 
 volumes:
   memovolume:
+  memosocket:
