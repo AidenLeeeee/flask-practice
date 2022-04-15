@@ -35,7 +35,7 @@ parser.add_argument('title', required=True, help='title', location='form')
 parser.add_argument('content', required=True, help='content', location='form')
 parser.add_argument('linked_image', required=False, type=FileStorage, help='memo_image', location='files')
 parser.add_argument('is_deleted', required=False, type=inputs.boolean, help='memo_delete_flag', location='form')
-parser.add_argument('labels', action='split', help='label_num_comma_string', location='form')
+parser.add_argument('labels', action='split', help='label_content_comma_string', location='form')
 
 put_parser = parser.copy()
 put_parser.replace_argument('title', required=False, help='memo_title', location='form')
