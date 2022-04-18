@@ -1,0 +1,21 @@
+version: '3.7'
+services:  
+  memo-db:
+      container_name: memo-db
+      image: mysql:5.7
+      networks:
+        - memonet
+      environment:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_DATABASE: project
+      command:
+        - --character-set-server=utf8
+        - --collation-server=utf8_general_ci
+      # ports:
+      #   - 3306:3306
+      volumes:
+        - memovolume:/var/lib/mysql
+      restart: always
+
+volumes:
+  memovolume:
